@@ -60,7 +60,7 @@ export function statusText(board: Board): string {
   const filled = Math.floor(level.current / level.required * 10);
   const unlocked = badges(board);
   const total = Object.values(board.completed).reduce((sum, value) => sum + value, 0);
-  return `🗺️ 任务冒险日志\nLv.${level.level} · ${board.xp} XP\n${'▰'.repeat(filled)}${'▱'.repeat(10 - filled)} ${level.current}/${level.required} XP\n完成 ${total} 个任务 · 进行中 ${board.active.length} 个\n徽章：${unlocked.length ? unlocked.join(' · ') : '完成第一个任务，点亮第一枚徽章！'}`;
+  return `🗺️ Qinghui 任务冒险日志\nLv.${level.level} · ${board.xp} XP\n${'▰'.repeat(filled)}${'▱'.repeat(10 - filled)} ${level.current}/${level.required} XP\n完成 ${total} 个任务 · 进行中 ${board.active.length} 个\n徽章：${unlocked.length ? unlocked.join(' · ') : '完成第一个任务，点亮第一枚徽章！'}`;
 }
 
 export function addQuest(board: Board, title: string, difficulty: string, maxActive: number, now = new Date()): { board: Board; quest: Quest } {
@@ -103,7 +103,7 @@ export function abandonQuest(board: Board, id: string): Board {
 
 export function validateId(id: string): void {
   if (typeof id !== 'string' || !z.string().uuid().safeParse(id).success) {
-    throw new QuestError('INVALID_QUEST_ID', '请使用 quest_add 或 quest_list 返回的完整任务 ID。');
+    throw new QuestError('INVALID_QUEST_ID', '请使用 qinghui_quest_add 或 qinghui_quest_list 返回的完整任务 ID。');
   }
 }
 

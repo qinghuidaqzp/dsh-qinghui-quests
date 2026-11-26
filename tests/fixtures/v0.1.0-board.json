@@ -1,0 +1,37 @@
+{
+  "unit": {
+    "name": "dsh_quest_log",
+    "version": 1
+  },
+  "global": null,
+  "tables": {
+    "boards": {
+      "3fa70395d4ca9249d2fcd6967c0bf95dde7d65778b698ec8bcd59edd43729550": {
+        "version": 1,
+        "xp": 50,
+        "completed": {
+          "easy": 0,
+          "medium": 0,
+          "hard": 1
+        },
+        "active": [
+          {
+            "id": "fde0692e-d066-4840-8706-72589e0b0eb8",
+            "title": "旧版进行中任务",
+            "difficulty": "easy",
+            "createdAt": "2026-11-26T04:58:22.535Z"
+          }
+        ],
+        "recent": [
+          {
+            "id": "2bf69253-3f38-4656-be0e-2a6bc9ac5a22",
+            "title": "旧版已完成任务",
+            "difficulty": "hard",
+            "createdAt": "2026-11-26T04:58:22.517Z",
+            "completedAt": "2026-11-26T04:58:22.525Z"
+          }
+        ]
+      }
+    }
+  }
+}

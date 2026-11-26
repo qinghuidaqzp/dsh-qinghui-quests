@@ -1,17 +1,17 @@
 {
-  "name": "dsh-quest-log",
-  "version": "0.1.0",
-  "description": "DeepSeek Harness 任务冒险日志：把任务变成冒险，完成后获得经验、等级与徽章。",
+  "name": "dsh-qinghui-quests",
+  "version": "0.1.1",
+  "description": "Qinghui 任务冒险日志：将任务变成冒险，完成后获得经验、等级与徽章，进度按 Harness 会话保存。",
   "type": "module",
   "license": "MIT",
   "author": "qinghuidaqzp",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/qinghuidaqzp/dsh-quest-log.git"
+    "url": "git+https://github.com/qinghuidaqzp/dsh-qinghui-quests.git"
   },
-  "homepage": "https://github.com/qinghuidaqzp/dsh-quest-log#readme",
+  "homepage": "https://github.com/qinghuidaqzp/dsh-qinghui-quests#readme",
   "bugs": {
-    "url": "https://github.com/qinghuidaqzp/dsh-quest-log/issues"
+    "url": "https://github.com/qinghuidaqzp/dsh-qinghui-quests/issues"
   },
   "engines": {
     "node": ">=22"

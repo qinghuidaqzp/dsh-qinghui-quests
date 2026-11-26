@@ -6,7 +6,7 @@ import { defineTool, type ToolRunContext } from '@deepseek-ai/dsh-tools';
 import { defineDomain, domainTable } from '@deepseek-ai/dsh-storage-domain';
 import { addQuest, abandonQuest, boardSchema, completeQuest, displayTitle, levelInfo, listText, newBoard, QuestError, statusText, XP } from './quests.js';
 
-export const name = 'quest-log';
+export const name = 'qinghui-quests';
 export const inject = ['tools', 'storageDomain'];
 export interface Config { maxActive: number; maxBoards: number }
 export const Config = schema.object({
@@ -14,9 +14,10 @@ export const Config = schema.object({
   maxBoards: schema.number().step(1).min(1).max(2000).default(500).description('插件最多保存多少个会话的冒险记录。'),
 });
 
+// Preserve the v0.1.0 storage identity so a package/tool rename never resets progress.
 export const questDomain = defineDomain({ name: 'dsh_quest_log', version: 1, layout: 'single', tables: { boards: domainTable(boardSchema) } });
 export function sessionKey(id: unknown): string {
-  if (typeof id !== 'string' || !id || id.length > 1024) throw new QuestError('SESSION_REQUIRED', '任务冒险日志需要在有效的 Harness 会话中调用。');
+  if (typeof id !== 'string' || !id || id.length > 1024) throw new QuestError('SESSION_REQUIRED', 'Qinghui 任务冒险日志需要在有效的 Harness 会话中调用。');
   return createHash('sha256').update(id).digest('hex');
 }
 
@@ -30,7 +31,7 @@ export async function apply(ctx: Context, config: Config): Promise<void> {
   function run<T>(exec: ToolRunContext, operation: (key: string) => Promise<T> | T): Promise<T> {
     const work = chain.then(async () => {
       exec.signal.throwIfAborted();
-      if (disposed) throw new QuestError('PLUGIN_UNLOADED', '任务冒险日志已卸载，请重新启用插件。');
+      if (disposed) throw new QuestError('PLUGIN_UNLOADED', 'Qinghui 任务冒险日志已卸载，请重新启用插件。');
       return operation(sessionKey(exec.agent?.id ?? exec.agent?.session?.id));
     }).catch(error => {
       if (error instanceof QuestError) throw new HarnessError(error.message, error.code, { cause: error });
@@ -46,7 +47,7 @@ export async function apply(ctx: Context, config: Config): Promise<void> {
   } as const;
 
   ctx.tools.register(defineTool({
-    name: 'quest_add',
+    name: 'qinghui_quest_add',
     description: 'Add a user-requested task to this session’s adventure log. This only tracks a task; it does not perform or schedule the underlying work. Easy=10 XP, medium=25 XP, hard=50 XP. Choose difficulty with the user’s intent.',
     parameters: { title: { type: 'string', required: true, description: 'A concrete task title, 1–160 characters.' }, difficulty: { type: 'string', enum: ['easy', 'medium', 'hard'], description: 'Difficulty, default medium.' } },
     output, isConcurrencySafe: () => true,
@@ -60,7 +61,7 @@ export async function apply(ctx: Context, config: Config): Promise<void> {
   }));
 
   ctx.tools.register(defineTool({
-    name: 'quest_list', description: 'List tasks and recent completed quests for the current Harness session only.',
+    name: 'qinghui_quest_list', description: 'List tasks and recent completed quests for the current Harness session only.',
     parameters: { filter: { type: 'string', enum: ['active', 'completed', 'all'], description: 'Default active.' }, limit: { type: 'integer', description: 'Maximum items in each section, 1–100; default 20.' } },
     output, isConcurrencySafe: () => true,
     execute: (args, exec) => run(exec, key => {
@@ -74,9 +75,9 @@ export async function apply(ctx: Context, config: Config): Promise<void> {
   }));
 
   ctx.tools.register(defineTool({
-    name: 'quest_complete',
+    name: 'qinghui_quest_complete',
     description: 'Mark a quest complete only after the user confirms completion or the actual work has been verified. This awards XP; it does not execute or verify the underlying work itself. A quest ID can earn XP only once.',
-    parameters: { quest_id: { type: 'string', required: true, description: 'Full quest UUID returned by quest_add/quest_list.' } },
+    parameters: { quest_id: { type: 'string', required: true, description: 'Full quest UUID returned by qinghui_quest_add/qinghui_quest_list.' } },
     output, isConcurrencySafe: () => true,
     execute: (args, exec) => run(exec, async key => {
       const previous = boards.get(key) ?? newBoard();
@@ -90,14 +91,14 @@ export async function apply(ctx: Context, config: Config): Promise<void> {
   }));
 
   ctx.tools.register(defineTool({
-    name: 'quest_status', description: 'Show this session’s level, XP, active quest count and unlocked badges. Does not expose other sessions.',
+    name: 'qinghui_quest_status', description: 'Show this session’s level, XP, active quest count and unlocked badges. Does not expose other sessions.',
     parameters: {}, output, isConcurrencySafe: () => true,
     execute: (_args, exec) => run(exec, key => ({ text: statusText(boards.get(key) ?? newBoard()) })),
     presentCall: () => ({ card: 'generic', title: '查看冒险者状态', kind: 'read' }),
   }));
 
   ctx.tools.register(defineTool({
-    name: 'quest_abandon', description: 'Remove one active quest only when the user wants to abandon it. Does not award or subtract XP. Completed history is not removed.',
+    name: 'qinghui_quest_abandon', description: 'Remove one active quest only when the user wants to abandon it. Does not award or subtract XP. Completed history is not removed.',
     parameters: { quest_id: { type: 'string', required: true, description: 'Full active quest UUID.' } },
     output, isConcurrencySafe: () => true,
     execute: (args, exec) => run(exec, async key => {
